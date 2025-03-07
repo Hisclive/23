@@ -1,23 +1,528 @@
 <!DOCTYPE html>
-<style>
-  /* netnet default bg */
-  body {
-    margin: 0;
-    background-image: linear-gradient(#515199a8 2px, transparent 1px),
-      linear-gradient(90deg, #515199a8 2px, transparent 1px);
-    background-size: 50px 50px;
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-  }
-
-  body::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(0deg, #c76ebca8, #515199a8);
-  }
-</style>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game-Inspired Mindmap</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      position: relative;
+      margin: 0;
+      padding: 0;
+    }
+    /* 점수 표시 영역 */
+    #score {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      background-color: #28a745;
+      color: white;
+      border-radius: 4px;
+      z-index: 1000;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+      position: relative; /* 자식 요소의 절대 위치 배치를 위해 */
+    }
+    .node {
+      background-color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      margin: 10px;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.3s ease, left 0.8s ease, top 0.8s ease;
+      display: inline-block;
+    }
+    .node:hover {
+      transform: scale(1.05);
+      background-color: #e0e0e0;
+    }
+    .leaf { }
+    .hidden { display: none; }
+    /* 각 카테고리 컨테이너 (하위 노드 배치를 위한 영역) */
+    .category {
+      display: none;
+      position: relative;
+      width: 100%;
+      height: 300px; /* 필요에 따라 조정 */
+      border: 1px dashed #ccc;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">Score: 0</div>
+  <div class="container">
+    <h1 id="title">Game-Inspired Mindmap</h1>
+    <!-- 최상위 버튼 -->
+    <div class="node" onclick="toggleGenres()" id="games">🎮 Games</div>
     
+    <!-- 메인 장르 메뉴 -->
+    <div id="genres">
+      <div class="node" onclick="activateCategory('action')">⚔️ Action</div>
+      <div class="node" onclick="activateCategory('adventure')">🌍 Adventure</div>
+      <div class="node" onclick="activateCategory('rpg')">🛡 RPG</div>
+      <div class="node" onclick="activateCategory('simulation')">🛠 Simulation</div>
+      <div class="node" onclick="activateCategory('strategy')">♟ Strategy</div>
+      <div class="node" onclick="activateCategory('sports')">🏆 Sports & Racing</div>
+    </div>
+    
+    <!-- 예시로 Action 카테고리 (나머지 카테고리는 동일하게 유지) -->
+    <div id="action" class="category">
+      <div class="node" onclick="activateCategory('fps')">🎯 FPS</div>
+      <div class="node" onclick="activateCategory('thirdperson')">🔫 Third-Person Shooter</div>
+      <div class="node" onclick="activateCategory('fighting')">🥋 Fighting & Martial Arts</div>
+      <div class="node" onclick="activateCategory('shootemup')">🚀 Shoot 'em Up</div>
+      <div class="node" onclick="activateCategory('rythmarcade')">🎶 Rhythm & Arcade</div>
+      <div class="node" onclick="activateCategory('platformer')">🦘 Platformer</div>
+      <div class="node" onclick="activateCategory('hackandslash')">🗡 Hack & Slash</div>
+    </div>
+    
+    <!-- Action 하위 세부 카테고리들 (FPS, Third-Person, 등) -->
+    <div id="fps" class="category">
+      <div class="node leaf">🤖 Overwatch</div>
+      <div class="node leaf">🔫 Call of Duty</div>
+      <div class="node leaf">🎮 Battlefield</div>
+      <div class="node leaf">💣 Counter-Strike</div>
+      <div class="node leaf">👹 Doom</div>
+    </div>
+    <div id="thirdperson" class="category">
+      <div class="node leaf">🎮 Gears of War</div>
+      <div class="node leaf">📦 Uncharted 4</div>
+      <div class="node leaf">⏱ Max Payne 3</div>
+      <div class="node leaf">💥 Spec Ops: The Line</div>
+      <div class="node leaf">👾 The Last of Us</div>
+    </div>
+    <div id="fighting" class="category">
+      <div class="node leaf">Tekken 7</div>
+      <div class="node leaf">Street Fighter V</div>
+      <div class="node leaf">Mortal Kombat 11</div>
+      <div class="node leaf">SoulCalibur VI</div>
+      <div class="node leaf">Virtua Fighter 5</div>
+    </div>
+    <div id="shootemup" class="category">
+      <div class="node leaf">Ikaruga</div>
+      <div class="node leaf">Gradius V</div>
+      <div class="node leaf">R-Type Final</div>
+      <div class="node leaf">DoDonPachi Resurrection</div>
+      <div class="node leaf">1942</div>
+    </div>
+    <div id="rythmarcade" class="category">
+      <div class="node leaf">Dance Dance Revolution</div>
+      <div class="node leaf">Beatmania IIDX</div>
+      <div class="node leaf">Osu!</div>
+      <div class="node leaf">Guitar Hero</div>
+      <div class="node leaf">Rock Band</div>
+      <div class="node leaf">Deemo</div>
+      <div class="node leaf">Cytus 2</div>
+    </div>
+    <div id="platformer" class="category">
+      <div class="node leaf">Super Mario Odyssey</div>
+      <div class="node leaf">Celeste</div>
+      <div class="node leaf">Ori and the Blind Forest</div>
+      <div class="node leaf">Donkey Kong Country</div>
+      <div class="node leaf">Rayman Legends</div>
+    </div>
+    <div id="hackandslash" class="category">
+      <div class="node leaf">⚔️ God of War</div>
+      <div class="node leaf">🐉 Devil May Cry</div>
+      <div class="node leaf">🦸 Bayonetta</div>
+      <div class="node leaf">🔪 Ninja Gaiden</div>
+    </div>
+    
+    <!-- Adventure 카테고리: 하위 카테고리 버튼으로 분리 -->
+    <div id="adventure" class="category">
+      <div class="node" onclick="activateCategory('metroidvania')">🕵️ Metroidvania</div>
+      <div class="node" onclick="activateCategory('visualnovel')">📖 Visual Novel</div>
+      <div class="node" onclick="activateCategory('adventurerpg')">🏹 Adventure RPG</div>
+      <div class="node" onclick="activateCategory('casual')">🎭 Casual</div>
+      <div class="node" onclick="activateCategory('puzzle')">🧩 Puzzle</div>
+      <div class="node" onclick="activateCategory('storyrich')">📜 Story-Rich</div>
+      <div class="node" onclick="activateCategory('hiddenobject')">🔍 Hidden Object</div>
+    </div>
+    <!-- Adventure - Metroidvania -->
+    <div id="metroidvania" class="category">
+      <div class="node leaf">Super Metroid</div>
+      <div class="node leaf">Castlevania: Symphony of the Night</div>
+      <div class="node leaf">Hollow Knight</div>
+      <div class="node leaf">Ori and the Blind Forest</div>
+      <div class="node leaf">Dead Cells</div>
+    </div>
+    <!-- Adventure - Visual Novel -->
+    <div id="visualnovel" class="category">
+      <div class="node leaf">Clannad</div>
+      <div class="node leaf">Steins;Gate</div>
+      <div class="node leaf">Danganronpa</div>
+      <div class="node leaf">Phoenix Wright: Ace Attorney</div>
+    </div>
+    <!-- Adventure - Adventure RPG -->
+    <div id="adventurerpg" class="category">
+      <div class="node leaf">Kingdom Hearts</div>
+      <div class="node leaf">Secret of Mana</div>
+      <div class="node leaf">Golden Sun</div>
+    </div>
+    <!-- Adventure - Casual -->
+    <div id="casual" class="category">
+      <div class="node leaf">Animal Crossing: New Horizons</div>
+      <div class="node leaf">Stardew Valley</div>
+      <div class="node leaf">The Sims 4</div>
+    </div>
+    <!-- Adventure - Puzzle -->
+    <div id="puzzle" class="category">
+      <div class="node leaf">Tetris</div>
+      <div class="node leaf">Candy Crush Saga</div>
+      <div class="node leaf">Portal</div>
+      <div class="node leaf">The Witness</div>
+      <div class="node leaf">Lumines</div>
+    </div>
+    <!-- Adventure - Story-Rich -->
+    <div id="storyrich" class="category">
+      <div class="node leaf">Bioshock</div>
+      <div class="node leaf">Heavy Rain</div>
+      <div class="node leaf">Life is Strange</div>
+      <div class="node leaf">The Last of Us</div>
+    </div>
+    <!-- Adventure - Hidden Object -->
+    <div id="hiddenobject" class="category">
+      <div class="node leaf">Mystery Case Files</div>
+      <div class="node leaf">Hidden Expedition</div>
+      <div class="node leaf">Gardenscapes</div>
+    </div>
+    
+   <!-- RPG 카테고리: 하위 카테고리 버튼으로 분리 -->
+<div id="rpg" class="category">
+  <div class="node" onclick="activateCategory('jrpg')">🐉 JRPG</div>
+  <div class="node" onclick="activateCategory('roguelike')">🎲 Roguelike</div>
+  <div class="node" onclick="activateCategory('actionrpg')">⚔️ Action RPG</div>
+  <div class="node" onclick="activateCategory('adventurerpg')">🏰 Adventure RPG</div>
+  <div class="node" onclick="activateCategory('tacticalrpg')">🛡 Tactical RPG</div>
+  <div class="node" onclick="activateCategory('turnrpg')">♻️ Turn-Based RPG</div>
+  <div class="node" onclick="activateCategory('partyrpg')">👥 Party-Based RPG</div>
+</div>
+
+<!-- RPG - JRPG -->
+<div id="jrpg" class="category">
+  <div class="node leaf">Final Fantasy VII Remake</div>
+  <div class="node leaf">Persona 5</div>
+  <div class="node leaf">Dragon Quest XI</div>
+</div>
+
+<!-- RPG - Roguelike -->
+<div id="roguelike" class="category">
+  <div class="node leaf">Hades</div>
+  <div class="node leaf">Enter the Gungeon</div>
+  <div class="node leaf">The Binding of Isaac</div>
+</div>
+
+<!-- RPG - Action RPG -->
+<div id="actionrpg" class="category">
+  <div class="node leaf">The Witcher 3</div>
+  <div class="node leaf">Dark Souls III</div>
+  <div class="node leaf">Nier: Automata</div>
+</div>
+
+<!-- RPG - Adventure RPG -->
+<div id="adventurerpg" class="category">
+  <div class="node leaf">Mass Effect</div>
+  <div class="node leaf">Kingdom Hearts</div>
+  <div class="node leaf">Final Fantasy XII</div>
+</div>
+
+<!-- RPG - Tactical RPG -->
+<div id="tacticalrpg" class="category">
+  <div class="node leaf">XCOM 2</div>
+  <div class="node leaf">Fire Emblem: Three Houses</div>
+  <div class="node leaf">Advance Wars</div>
+</div>
+
+<!-- RPG - Turn-Based RPG -->
+<div id="turnrpg" class="category">
+  <div class="node leaf">Divinity: Original Sin 2</div>
+  <div class="node leaf">Final Fantasy Tactics</div>
+  <div class="node leaf">Wasteland 3</div>
+</div>
+
+<!-- RPG - Party-Based RPG -->
+<div id="partyrpg" class="category">
+  <div class="node leaf">Baldur's Gate 3</div>
+  <div class="node leaf">Pillars of Eternity</div>
+  <div class="node leaf">Planescape: Torment</div>
+</div>
+
+    
+   <!-- Simulation 카테고리: 하위 카테고리 버튼으로 분리 -->
+    <div id="simulation" class="category">
+      <div class="node" onclick="activateCategory('building')">🏗 Building & Automation</div>
+      <div class="node" onclick="activateCategory('farming')">🌾 Farming & Crafting</div>
+      <div class="node" onclick="activateCategory('sandbox')">🧪 Sandbox & Physics</div>
+      <div class="node" onclick="activateCategory('lifesim')">🏡 Life & Immersive</div>
+      <div class="node" onclick="activateCategory('dating')">💞 Dating</div>
+      <div class="node" onclick="activateCategory('space')">🚀 Space & Flight</div>
+      <div class="node" onclick="activateCategory('hobby')">🔧 Hobby & Job</div>
+    </div>
+    
+    <!-- Simulation - Building & Automation -->
+    <div id="building" class="category">
+      <div class="node leaf">Cities: Skylines</div>
+      <div class="node leaf">SimCity</div>
+      <div class="node leaf">Factorio</div>
+    </div>
+    
+    <!-- Simulation - Farming & Crafting -->
+    <div id="farming" class="category">
+      <div class="node leaf">Farming Simulator 19</div>
+      <div class="node leaf">Stardew Valley</div>
+      <div class="node leaf">My Time at Portia</div>
+    </div>
+    
+    <!-- Simulation - Sandbox & Physics -->
+    <div id="sandbox" class="category">
+      <div class="node leaf">Minecraft</div>
+      <div class="node leaf">Kerbal Space Program</div>
+      <div class="node leaf">Garry's Mod</div>
+      <div class="node leaf">Besiege</div>
+      <div class="node leaf">Space Engineers</div>
+    </div>
+    
+    <!-- Simulation - Life & Immersive -->
+    <div id="lifesim" class="category">
+      <div class="node leaf">The Sims 4</div>
+      <div class="node leaf">Animal Crossing: New Horizons</div>
+      <div class="node leaf">House Flipper</div>
+    </div>
+    
+    <!-- Simulation - Dating -->
+    <div id="dating" class="category">
+      <div class="node leaf">HuniePop</div>
+      <div class="node leaf">Dream Daddy</div>
+      <div class="node leaf">LongStory</div>
+    </div>
+    
+    <!-- Simulation - Space & Flight -->
+    <div id="space" class="category">
+      <div class="node leaf">Microsoft Flight Simulator</div>
+      <div class="node leaf">Elite Dangerous</div>
+      <div class="node leaf">No Man's Sky</div>
+    </div>
+    
+    <!-- Simulation - Hobby & Job -->
+    <div id="hobby" class="category">
+      <div class="node leaf">Job Simulator</div>
+      <div class="node leaf">PC Building Simulator</div>
+    </div>
+    
+   <!-- Strategy 카테고리: 하위 카테고리 버튼으로 분리 -->
+<div id="strategy" class="category">
+  <div class="node" onclick="activateCategory('military')">⚔️ Military Strategy</div>
+  <div class="node" onclick="activateCategory('grand')">🌍 Grand Strategy & 4X</div>
+  <div class="node" onclick="activateCategory('city')">🏙 City Building</div>
+  <div class="node" onclick="activateCategory('rts_strat')">⚡ Real-Time Strategy</div>
+  <div class="node" onclick="activateCategory('card')">🃏 Card & Board Games</div>
+  <div class="node" onclick="activateCategory('tower')">🛡 Tower Defense</div>
+  <div class="node" onclick="activateCategory('turn')">♟ Turn-Based Strategy</div>
+</div>
+
+<!-- Strategy - Military Strategy -->
+<div id="military" class="category">
+  <div class="node leaf">Company of Heroes</div>
+  <div class="node leaf">Commandos 2</div>
+  <div class="node leaf">Steel Division 2</div>
+  <div class="node leaf">Men of War</div>
+</div>
+
+<!-- Strategy - Grand Strategy & 4X -->
+<div id="grand" class="category">
+  <div class="node leaf">Europa Universalis IV</div>
+  <div class="node leaf">Crusader Kings III</div>
+  <div class="node leaf">Stellaris</div>
+  <div class="node leaf">Master of Orion</div>
+</div>
+
+<!-- Strategy - City Building -->
+<div id="city" class="category">
+  <div class="node leaf">Cities: Skylines</div>
+  <div class="node leaf">SimCity 4</div>
+  <div class="node leaf">Anno 1800</div>
+</div>
+
+<!-- Strategy - Real-Time Strategy -->
+<div id="rts_strat" class="category">
+  <div class="node leaf">StarCraft II</div>
+  <div class="node leaf">Age of Empires II: Definitive Edition</div>
+  <div class="node leaf">Warcraft III: Reforged</div>
+  <div class="node leaf">Rise of Nations</div>
+</div>
+
+<!-- Strategy - Card & Board Games -->
+<div id="card" class="category">
+  <div class="node leaf">Hearthstone</div>
+  <div class="node leaf">Gwent</div>
+  <div class="node leaf">Slay the Spire</div>
+  <div class="node leaf">Magic: The Gathering Arena</div>
+</div>
+
+<!-- Strategy - Tower Defense -->
+<div id="tower" class="category">
+  <div class="node leaf">Plants vs. Zombies</div>
+  <div class="node leaf">Kingdom Rush</div>
+  <div class="node leaf">Bloons TD 6</div>
+  <div class="node leaf">Defense Grid: The Awakening</div>
+</div>
+
+<!-- Strategy - Turn-Based Strategy -->
+<div id="turn" class="category">
+  <div class="node leaf">Civilization VI</div>
+  <div class="node leaf">XCOM 2</div>
+  <div class="node leaf">Total War: Warhammer II</div>
+  <div class="node leaf">Wargame: Red Dragon</div>
+</div>
+
+    
+    <!-- Sports & Racing 카테고리: 하위 카테고리 버튼으로 분리 -->
+    <div id="sports" class="category">
+      <div class="node" onclick="activateCategory('individual')">⚽ Individual Sports</div>
+      <div class="node" onclick="activateCategory('fishing')">🎣 Fishing & Hunting</div>
+      <div class="node" onclick="activateCategory('racing')">🏎 Racing</div>
+      <div class="node" onclick="activateCategory('racingSim')">🏁 Racing Simulation</div>
+      <div class="node" onclick="activateCategory('allsports')">🏀 All Sports</div>
+      <div class="node" onclick="activateCategory('sportSim')">🎮 Sports Simulation</div>
+      <div class="node" onclick="activateCategory('teamsports')">⚾ Team Sports</div>
+    </div>
+    
+    <!-- Sports & Racing - Individual Sports -->
+    <div id="individual" class="category">
+      <div class="node leaf">Wii Sports</div>
+      <div class="node leaf">Virtua Tennis 4</div>
+      <div class="node leaf">PGA Tour 2K21</div>
+    </div>
+    
+    <!-- Sports & Racing - Fishing & Hunting -->
+    <div id="fishing" class="category">
+      <div class="node leaf">theHunter: Call of the Wild</div>
+      <div class="node leaf">Fishing Sim World: Pro Tour</div>
+      <div class="node leaf">Bass Pro Shops: The Strike</div>
+    </div>
+    
+    <!-- Sports & Racing - Racing -->
+    <div id="racing" class="category">
+      <div class="node leaf">Gran Turismo</div>
+      <div class="node leaf">Forza Horizon 5</div>
+      <div class="node leaf">Need for Speed Heat</div>
+    </div>
+    
+    <!-- Sports & Racing - Racing Simulation -->
+    <div id="racingSim" class="category">
+      <div class="node leaf">Assetto Corsa</div>
+      <div class="node leaf">Project CARS 2</div>
+      <div class="node leaf">rFactor 2</div>
+    </div>
+    
+    <!-- Sports & Racing - All Sports -->
+    <div id="allsports" class="category">
+      <div class="node leaf">Mario & Sonic at the Olympic Games</div>
+      <div class="node leaf">Sports Champions</div>
+      <div class="node leaf">Wii Sports Resort</div>
+    </div>
+    
+    <!-- Sports & Racing - Sports Simulation -->
+    <div id="sportSim" class="category">
+      <div class="node leaf">FIFA 23</div>
+      <div class="node leaf">NBA 2K23</div>
+      <div class="node leaf">Madden NFL 23</div>
+    </div>
+    
+    <!-- Sports & Racing - Team Sports -->
+    <div id="teamsports" class="category">
+      <div class="node leaf">Rocket League</div>
+      <div class="node leaf">MLB The Show 22</div>
+      <div class="node leaf">NHL 22</div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    let score = 0;
+    function updateScore(points) {
+      score += points;
+      document.getElementById('score').textContent = "Score: " + score;
+    }
+
+    // "Games" 버튼 클릭 시: 장르 메뉴 표시 및 스코어 증가
+    function toggleGenres() {
+      updateScore(5);
+      let genres = document.getElementById('genres');
+      if (genres.style.display === "none" || genres.style.display === "") {
+        genres.style.display = "flex";
+        document.querySelectorAll('.category').forEach(cat => cat.style.display = "none");
+      }
+    }
+
+    // 특정 카테고리 버튼 클릭 시: 해당 컨테이너의 노드를 충돌 없이 랜덤 배치하며 표시, 스코어 증가
+    function activateCategory(categoryId) {
+      updateScore(5);
+      document.getElementById('genres').style.display = "none";
+      document.querySelectorAll('.category').forEach(cat => cat.style.display = "none");
+      let category = document.getElementById(categoryId);
+      category.style.display = "block";
+      let container = document.querySelector('.container');
+      let containerRect = container.getBoundingClientRect();
+      let placedRects = [];
+      
+      category.querySelectorAll('.node').forEach(node => {
+        node.style.position = "absolute";
+        let nodeWidth = node.offsetWidth;
+        let nodeHeight = node.offsetHeight;
+        // 중앙에서 시작
+        let centerLeft = (containerRect.width - nodeWidth) / 2;
+        let centerTop = (containerRect.height - nodeHeight) / 2;
+        node.style.left = centerLeft + "px";
+        node.style.top = centerTop + "px";
+        
+        let maxLeft = containerRect.width - nodeWidth;
+        let maxTop = containerRect.height - nodeHeight;
+        let attempts = 0;
+        let maxAttempts = 100;
+        let placed = false;
+        let randomLeft = 0, randomTop = 0;
+        while (!placed && attempts < maxAttempts) {
+          randomLeft = Math.random() * maxLeft;
+          randomTop = Math.random() * maxTop;
+          let nodeRect = {
+            left: randomLeft,
+            top: randomTop,
+            right: randomLeft + nodeWidth,
+            bottom: randomTop + nodeHeight
+          };
+          let collides = placedRects.some(rect => {
+            return !(nodeRect.right < rect.left || nodeRect.left > rect.right ||
+                     nodeRect.bottom < rect.top || nodeRect.top > rect.bottom);
+          });
+          if (!collides) {
+            placed = true;
+            placedRects.push(nodeRect);
+          }
+          attempts++;
+        }
+        // 100ms 후 최종 좌표로 이동 (transition 효과 적용)
+        setTimeout(() => {
+          node.style.left = randomLeft + "px";
+          node.style.top = randomTop + "px";
+        }, 100);
+      });
+    }
+
+    // 하위 노드(leaf) 클릭 시 스코어 증가
+    document.querySelectorAll('.leaf').forEach(node => {
+      node.addEventListener('click', () => updateScore(5));
+    });
+  </script>
+</body>
+</html>
